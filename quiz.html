@@ -1,0 +1,1785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudySync AI - Smart AI Study Buddy & Quiz Generator</title>
+    <meta name="description" content="Accelerate your learning with personalized AI study guides, instant interactive quizzes, and visual progress analytics.">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheets -->
+    <style>
+   /* ==========================================================================
+   DESIGN VARIABLES & INITIAL RESETS
+   ========================================================================== */
+:root {
+    --bg-dark: #070913;
+    --bg-card: rgba(17, 24, 39, 0.65);
+    --bg-card-hover: rgba(26, 36, 56, 0.85);
+    
+    --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    --secondary-gradient: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+    --accent-glow: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+
+    --text-primary: #f3f4f6;
+    --text-secondary: #9ca3af;
+    --text-muted: #6b7280;
+    
+    --primary: #6366f1;
+    --primary-hover: #4f46e5;
+    --accent-cyan: #22d3ee;
+    --emerald-light: #34d399;
+    --coral-light: #f87171;
+
+    --border-glass: rgba(255, 255, 255, 0.08);
+    --border-glass-focused: rgba(255, 255, 255, 0.2);
+    --shadow-premium: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+    --shadow-inset: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+
+    --transition-smooth: all 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+    font-family: 'Inter', -apple-system, sans-serif;
+    color: var(--text-primary);
+    background-color: var(--bg-dark);
+    -webkit-font-smoothing: antialiased;
+}
+
+body {
+    overflow-x: hidden;
+    position: relative;
+    line-height: 1.6;
+}
+
+/* ==========================================================================
+   REUSABLE UI COMPONENTS (BUTTONS, GLASSMORPHISM, SECTION GRID)
+   ========================================================================== */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+    width: 100%;
+}
+
+/* Glassmorphism Class */
+.glass {
+    background: var(--bg-card);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border-glass);
+    box-shadow: var(--shadow-premium), var(--shadow-inset);
+    border-radius: 16px;
+}
+
+/* Buttons */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    border: none;
+    white-space: nowrap;
+}
+
+.btn-primary {
+    background: var(--primary-gradient);
+    color: #ffffff;
+    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.6);
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+    border: 1px solid var(--border-glass);
+    backdrop-filter: blur(8px);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: var(--border-glass-focused);
+    transform: translateY(-2px);
+}
+
+.btn-sm {
+    padding: 8px 18px;
+    font-size: 0.875rem;
+}
+
+.btn-lg {
+    padding: 14px 28px;
+    font-size: 1.05rem;
+}
+
+.btn-full {
+    width: 100%;
+    padding: 12px;
+}
+
+/* Gradients & Text */
+.gradient-text {
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.accent-text {
+    color: var(--accent-cyan);
+}
+
+.text-emerald {
+    color: var(--emerald-light);
+}
+
+.badge {
+    background: rgba(99, 102, 241, 0.12);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    color: #a5b4fc;
+    padding: 6px 14px;
+    border-radius: 30px;
+    font-size: 0.812rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    display: inline-block;
+    margin-bottom: 20px;
+}
+
+/* Header Text / Section Spacing */
+.section-header {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto 60px;
+}
+
+.section-tag {
+    color: var(--primary);
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    display: block;
+    margin-bottom: 12px;
+}
+
+.section-title {
+    font-size: 2.25rem;
+    font-weight: 700;
+    line-height: 1.25;
+    margin-bottom: 16px;
+    color: #ffffff;
+}
+
+.section-subtitle {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+/* Global Ambient Lighting */
+.glow-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.55;
+}
+
+.orb-1 {
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.22) 0%, rgba(0,0,0,0) 70%);
+    top: -100px;
+    left: -100px;
+}
+
+.orb-2 {
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, rgba(0,0,0,0) 70%);
+    top: 600px;
+    right: -200px;
+}
+
+/* ==========================================================================
+   STICKY NAVBAR
+   ========================================================================== */
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    transition: var(--transition-smooth);
+    padding: 20px 0;
+}
+
+.header.scrolled {
+    padding: 12px 0;
+    background: rgba(7, 9, 19, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border-glass);
+}
+
+.navbar-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+}
+
+.logo-text {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: -0.02em;
+}
+
+.navbar-links-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+}
+
+.navbar-links {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    gap: 32px;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-size: 0.937rem;
+    font-weight: 500;
+    transition: var(--transition-smooth);
+}
+
+.nav-link:hover, .nav-link.active {
+    color: var(--text-primary);
+}
+
+.navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.mobile-menu-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+.mobile-menu-toggle .bar {
+    width: 25px;
+    height: 2px;
+    background-color: var(--text-primary);
+    transition: var(--transition-smooth);
+}
+
+/* ==========================================================================
+   HERO SECTION
+   ========================================================================== */
+.hero-section {
+    padding: 180px 24px 100px;
+    display: grid;
+    grid-template-columns: 1.12fr 0.88fr;
+    gap: 64px;
+    align-items: center;
+}
+
+.hero-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: #ffffff;
+    margin-bottom: 24px;
+}
+
+.hero-subtitle {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 36px;
+}
+
+.hero-cta-group {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 48px;
+    flex-wrap: wrap;
+}
+
+.hero-trust {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.avatar-group {
+    display: flex;
+}
+
+.trust-avatar {
+    width: 32px;
+    height: 32px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-glass);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    margin-left: -8px;
+    box-shadow: var(--shadow-premium);
+}
+
+.avatar-group .trust-avatar:first-child {
+    margin-left: 0;
+}
+
+.trust-text {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+/* Premium Dynamic App UI Preview */
+.hero-visual {
+    position: relative;
+    width: 100%;
+}
+
+.glass-preview-card {
+    background: rgba(13, 19, 36, 0.45);
+    border: 1px solid var(--border-glass);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--shadow-premium), var(--shadow-inset);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    transform: perspective(1000px) rotateY(-10deg) rotateX(8deg);
+    transition: var(--transition-smooth);
+}
+
+.glass-preview-card:hover {
+    transform: perspective(1000px) rotateY(0deg) rotateX(0deg) translateY(-6px);
+}
+
+.preview-header {
+    background: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid var(--border-glass);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    position: relative;
+}
+
+.preview-dots {
+    display: flex;
+    gap: 6px;
+}
+
+.preview-dots .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.preview-dots .red { background-color: var(--coral-light); }
+.preview-dots .yellow { background-color: #fbbf24; }
+.preview-dots .green { background-color: var(--emerald-light); }
+
+.preview-title {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.preview-body {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.preview-ai-bubble {
+    display: flex;
+    gap: 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-glass);
+    padding: 16px;
+    border-radius: 14px;
+}
+
+.avatar-mini {
+    width: 32px;
+    height: 32px;
+    background: var(--primary-gradient);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.bubble-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.bubble-text {
+    font-size: 0.875rem;
+    color: var(--text-primary);
+}
+
+.bubble-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.bubble-pill {
+    background: rgba(99, 102, 241, 0.15);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    padding: 4px 10px;
+    border-radius: 30px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #a5b4fc;
+}
+
+.preview-widget {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-glass);
+    padding: 16px;
+    border-radius: 12px;
+}
+
+.widget-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8125rem;
+    margin-bottom: 8px;
+}
+
+.widget-label { color: var(--text-secondary); }
+.widget-value { font-weight: 700; }
+
+.widget-progress-bg {
+    background: rgba(255, 255, 255, 0.05);
+    height: 6px;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.widget-progress-fill {
+    background: var(--primary-gradient);
+    height: 100%;
+    border-radius: 10px;
+}
+
+.hero-glow-back {
+    position: absolute;
+    width: 80%;
+    height: 80%;
+    background: var(--accent-glow);
+    top: 10%;
+    left: 10%;
+    z-index: -1;
+    filter: blur(40px);
+}
+
+/* ==========================================================================
+   FEATURES SECTION
+   ========================================================================== */
+.features-section {
+    padding: 100px 0;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+}
+
+.feature-card {
+    padding: 40px 30px;
+    transition: var(--transition-smooth);
+}
+
+.feature-card:hover {
+    transform: translateY(-8px);
+    background: var(--bg-card-hover);
+    border-color: var(--border-glass-focused);
+}
+
+.feature-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-bottom: 24px;
+}
+
+.bg-indigo { background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.25); }
+.bg-violet { background: rgba(168, 85, 247, 0.15); border: 1px solid rgba(168, 85, 247, 0.25); }
+.bg-cyan { background: rgba(6, 182, 212, 0.15); border: 1px solid rgba(6, 182, 212, 0.25); }
+.bg-pink { background: rgba(236, 72, 153, 0.15); border: 1px solid rgba(236, 72, 153, 0.25); }
+.bg-amber { background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.25); }
+.bg-emerald { background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.25); }
+
+.feature-card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: #ffffff;
+}
+
+.feature-card-text {
+    color: var(--text-secondary);
+    font-size: 0.937rem;
+    line-height: 1.5;
+}
+
+/* ==========================================================================
+   HOW IT WORKS
+   ========================================================================== */
+.how-it-works-section {
+    padding: 100px 0;
+    position: relative;
+}
+
+.steps-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+}
+
+.step-card {
+    position: relative;
+    padding: 30px;
+}
+
+.step-num {
+    font-size: 3rem;
+    font-weight: 800;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    background-clip: text; 
+    -webkit-text-fill-color: transparent;
+    opacity: 0.8;
+    margin-bottom: 12px;
+    line-height: 1;
+}
+
+.step-title {
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin-bottom: 14px;
+}
+
+.step-text {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+/* Connecting arrows across steps (desktops only) */
+.step-card:not(:last-child)::after {
+    content: "→";
+    position: absolute;
+    top: 45px;
+    right: -25px;
+    font-size: 24px;
+    color: var(--text-muted);
+}
+
+/* ==========================================================================
+   STATISTICS SECTION
+   ========================================================================== */
+.stats-section {
+    padding: 60px 0;
+    margin: 60px auto;
+    max-width: 1100px;
+    border-radius: 20px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    text-align: center;
+    gap: 24px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1;
+}
+
+.stat-plus {
+    font-size: 1.75rem;
+    color: var(--accent-cyan);
+    font-weight: 700;
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   TESTIMONIALS
+   ========================================================================== */
+.testimonials-section {
+    padding: 100px 0;
+}
+
+.testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+}
+
+.testimonial-card {
+    padding: 40px 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.testimonial-quote {
+    font-size: 3.5rem;
+    line-height: 1;
+    font-family: serif;
+    color: rgba(99, 102, 241, 0.25);
+    margin-top: -10px;
+}
+
+.testimonial-text {
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    line-height: 1.6;
+    margin-bottom: 24px;
+    font-style: italic;
+}
+
+.testimonial-author {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.author-avatar {
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-glass);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.author-name {
+    font-size: 0.937rem;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.author-role {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   FAQ SECTION (ACCORDION)
+   ========================================================================== */
+.faq-section {
+    padding: 100px 0;
+}
+
+.faq-accordion-wrapper {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.faq-item {
+    overflow: hidden;
+    transition: var(--transition-smooth);
+}
+
+.faq-trigger {
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    padding: 24px 30px;
+    color: #ffffff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.faq-icon {
+    font-size: 1.5rem;
+    color: var(--primary);
+    transition: var(--transition-smooth);
+}
+
+.faq-panel {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+}
+
+.faq-content {
+    padding: 0 30px 24px;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.faq-item.active {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.faq-item.active .faq-icon {
+    transform: rotate(45deg);
+}
+
+/* ==========================================================================
+   CONTACT SECTION
+   ========================================================================== */
+.contact-section {
+    padding: 100px 0;
+}
+
+.contact-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.contact-text {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    margin-bottom: 40px;
+}
+
+.contact-methods {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.contact-method-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.contact-method-item .icon {
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-glass);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.contact-method-item h4 {
+    color: #ffffff;
+    font-size: 0.937rem;
+    font-weight: 600;
+}
+
+.contact-method-item p {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.contact-form-wrapper {
+    padding: 40px;
+}
+
+.contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+
+.form-input {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-glass);
+    border-radius: 10px;
+    padding: 12px 16px;
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 0.95rem;
+    transition: var(--transition-smooth);
+}
+
+.form-input:focus {
+    border-color: var(--primary);
+    outline: none;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.form-success {
+    display: none;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    color: var(--emerald-light);
+    padding: 16px;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    text-align: center;
+    margin-top: 20px;
+}
+
+/* ==========================================================================
+   FOOTER
+   ========================================================================== */
+.footer {
+    border-top: 1px solid var(--border-glass);
+    background-color: #04060c;
+    padding: 80px 0 40px;
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr 1.5fr;
+    gap: 40px;
+}
+
+.footer-brand {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.footer-tagline {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.footer-copyright {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.footer-heading {
+    color: #ffffff;
+    font-size: 0.937rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.footer-links {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.footer-links a {
+    text-decoration: none;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    transition: var(--transition-smooth);
+}
+
+.footer-links a:hover {
+    color: #ffffff;
+}
+
+.footer-newsletter {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.newsletter-sub {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.newsletter-form {
+    display: flex;
+    gap: 8px;
+}
+
+.newsletter-input {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-glass);
+    border-radius: 50px;
+    padding: 10px 16px;
+    color: #ffffff;
+    font-size: 0.8125rem;
+    flex-grow: 1;
+}
+
+.newsletter-input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+/* ==========================================================================
+   RESPONSIVE LAYOUTS (BREAKPOINTS)
+   ========================================================================== */
+@media (max-width: 1024px) {
+    .hero-section {
+        grid-template-columns: 1fr;
+        gap: 48px;
+        text-align: center;
+        padding-top: 140px;
+    }
+    .hero-content {
+        align-items: center;
+    }
+    .features-grid, .testimonials-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .footer-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .section-title {
+        font-size: 1.85rem;
+    }
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    /* Sticky Mobile menu navigation overlays */
+    .mobile-menu-toggle {
+        display: flex;
+    }
+    .navbar-links-wrapper {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        height: 100vh;
+        width: 80%;
+        max-width: 400px;
+        background: rgba(10, 14, 26, 0.95);
+        backdrop-filter: blur(24px);
+        flex-direction: column;
+        justify-content: center;
+        padding: 80px 40px;
+        z-index: 999;
+        transition: var(--transition-smooth);
+        border-left: 1px solid var(--border-glass);
+    }
+    .navbar-links-wrapper.active {
+        right: 0;
+    }
+    .navbar-links {
+        flex-direction: column;
+        gap: 24px;
+        width: 100%;
+        text-align: center;
+    }
+    .navbar-actions {
+        flex-direction: column;
+        width: 100%;
+        margin-top: 40px;
+        gap: 16px;
+    }
+    .navbar-actions .btn {
+        width: 100%;
+    }
+    .features-grid, .steps-grid, .testimonials-grid, .contact-container {
+        grid-template-columns: 1fr;
+    }
+    .step-card:not(:last-child)::after {
+        display: none;
+    }
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    .footer-grid {
+        grid-template-columns: 1fr;
+    }
+    .newsletter-form {
+        flex-direction: column;
+    }
+    .newsletter-form .btn {
+        width: 100%;
+    }
+    .contact-form-wrapper {
+        padding: 24px;
+    }
+}
+*/
+</style>
+</head>
+<body>
+
+    <!-- Ambient background glow elements for premium SaaS look -->
+    <div class="glow-orb orb-1" aria-hidden="true"></div>
+    <div class="glow-orb orb-2" aria-hidden="true"></div>
+
+    <!-- Header / Navigation -->
+    <header class="header">
+        <div class="container navbar-container">
+            <a href="quiz.html" class="logo" aria-label="StudySync AI Home">
+                <!-- SVG Logo -->
+                <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="32" height="32" rx="8" fill="url(#logoGrad)"/>
+                    <path d="M9 16C12 11 20 11 23 16C20 21 12 21 9 16Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="16" cy="16" r="3" fill="white"/>
+                    <defs>
+                        <linearGradient id="logoGrad" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+                            <stop stop-color="#6366F1"/>
+                            <stop offset="1" stop-color="#A855F7"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <span class="logo-text">StudySync <span class="accent-text">AI</span></span>
+            </a>
+
+            <!-- Mobile Menu Toggle Button -->
+            <button class="mobile-menu-toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Toggle Navigation Menu">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+
+            <!-- Navigation Links -->
+            <nav id="primary-nav" class="navbar-links-wrapper">
+                <ul class="navbar-links">
+                    <li><a href="#features" class="nav-link">Features</a></li>
+                    <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
+                    <li><a href="#stats" class="nav-link">Stats</a></li>
+                    <li><a href="#testimonials" class="nav-link">Testimonials</a></li>
+                    <li><a href="#faq" class="nav-link">FAQ</a></li>
+                    <li><a href="#contact" class="nav-link">Contact</a></li>
+                </ul>
+                <div class="navbar-actions">
+                    <a href="quiz.html" class="btn btn-secondary btn-sm">Log In</a>
+                    <a href="#generator" class="btn btn-primary btn-sm">Get Started Free</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero-section container">
+            <div class="hero-content">
+                <span class="badge">Next-Gen AI Learning Platform</span>
+                <h1 class="hero-title">Your AI Study Companion for <span class="gradient-text">Faster Mastery</span></h1>
+                <p class="hero-subtitle">Upload your lectures, PDFs, or notes. Instantly generate customized, interactive quizzes, flashcards, and personalized study guides built around your learning style.</p>
+                <div class="hero-cta-group">
+                    <button onclick="startQuizPrompt()" class="btn btn-primary btn-lg">Generate Quiz Now</button>
+                    <a href="#how-it-works" class="btn btn-secondary btn-lg">See How It Works</a>
+                </div>
+                <div class="hero-trust">
+                    <div class="avatar-group">
+                        <span class="trust-avatar">🎓</span>
+                        <span class="trust-avatar">💻</span>
+                        <span class="trust-avatar">⚡</span>
+                    </div>
+                    <p class="trust-text">Join thousands of students and lifelong learners optimizing their study flow.</p>
+                </div>
+            </div>
+
+            <!-- AI Illustration Placeholder (Dynamic Glassmorphic App UI Preview) -->
+            <div class="hero-visual">
+                <div class="glass-preview-card">
+                    <div class="preview-header">
+                        <div class="preview-dots">
+                            <span class="dot red"></span>
+                            <span class="dot yellow"></span>
+                            <span class="dot green"></span>
+                        </div>
+                        <span class="preview-title">StudySync AI Platform</span>
+                    </div>
+                    <div class="preview-body">
+                        <!-- Simulated Interactive UI elements inside the illustration -->
+                        <div class="preview-ai-bubble">
+                            <div class="avatar-mini">🤖</div>
+                            <div class="bubble-content">
+                                <p class="bubble-text">I have analyzed your biology notes. Ready to generate a customized 15-question quiz on Cell Division?</p>
+                                <div class="bubble-actions">
+                                    <span class="bubble-pill">Generate MCQs</span>
+                                    <span class="bubble-pill">Generate Flashcards</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="preview-widget">
+                            <div class="widget-row">
+                                <span class="widget-label">Study Score Progress</span>
+                                <span class="widget-value text-emerald">94%</span>
+                            </div>
+                            <div class="widget-progress-bg">
+                                <div class="widget-progress-fill" style="width: 94%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-glow-back"></div>
+            </div>
+        </section>
+
+        <!-- Features Section (6 Cards) -->
+        <section id="features" class="features-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">Supercharge Your Mind</span>
+                    <h2 class="section-title">Designed to Make Learning Effortless</h2>
+                    <p class="section-subtitle">Tailored features crafted using modern AI engines, perfect for deep revision and targeted study.</p>
+                </div>
+
+                <div class="features-grid">
+                    <!-- Feature Card 1 -->
+                    <div class="feature-card glass">
+                        <div class="feature-icon bg-indigo">📝</div>
+                        <h3 class="feature-card-title">AI Smart Summaries</h3>
+                        <p class="feature-card-text">Condense hundreds of textbook pages or complex lecture videos into highly digestible, structured bullet points instantly.</p>
+                    </div>
+                    <!-- Feature Card 2 -->
+                    <div class="feature-card glass">
+                        <div class="feature-icon bg-violet">🧠</div>
+                        <h3 class="feature-card-title">Smart Quiz Generator</h3>
+                        <p class="feature-card-text">Generate personalized Multiple Choice, Fill-in-the-blank, or True/False questions dynamically from any study text.</p>
+                    </div>
+                    <!-- Feature Card 3 -->
+                    <div class="feature-card glass">
+                        <div class="feature-icon bg-cyan">🗂️</div>
+                        <h3 class="feature-card-title">Interactive Flashcards</h3>
+                        <p class="feature-card-text">Generate ready-made digital flashcards with intelligent spatial repetition algorithms to maximize long-term retention.</p>
+                    </div>
+                    <!-- Feature Card 4 -->
+                    <div class="feature-card glass">
+                        <div class="feature-icon bg-pink">💬</div>
+                        <h3 class="feature-card-title">24/7 AI Tutor Chat</h3>
+                        <p class="feature-card-text">Ask clarifying questions directly within your study materials. Get instant, step-by-step math, coding, or historical explanations.</p>
+                    </div>
+                    <!-- Feature Card 5 -->
+                    <div class="feature-card glass">
+                        <div class="feature-icon bg-amber">📊</div>
+                        <h3 class="feature-card-title">Performance Analytics</h3>
+                        <p class="feature-card-text">Trace your accuracy rates over time, track study streaks, and identify knowledge gaps using clear visual reports.</p>
+                    </div>
+                    <!-- Feature Card 6 -->
+                    <div class="feature-card glass">
+                        <div class="feature-icon bg-emerald">📂</div>
+                        <h3 class="feature-card-title">Multi-Format Upload</h3>
+                        <p class="feature-card-text">Support for PDFs, DOCX, text files, and audio recordings. Simply drag, drop, and convert static files into active sessions.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works Section -->
+        <section id="how-it-works" class="how-it-works-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">Simple Process</span>
+                    <h2 class="section-title">Master Any Subject in Three Steps</h2>
+                    <p class="section-subtitle">A streamlined three-step workflow built to turn passive reading into active, conversational recall.</p>
+                </div>
+
+                <div class="steps-grid">
+                    <!-- Step 1 -->
+                    <div class="step-card">
+                        <div class="step-num">01</div>
+                        <h3 class="step-title">Upload Study Material</h3>
+                        <p class="step-text">Paste plain text, upload documents (PDF, DOCX), or drop website links into the secure central portal.</p>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="step-card">
+                        <div class="step-num">02</div>
+                        <h3 class="step-title">AI Customization</h3>
+                        <p class="step-text">Our AI instantly drafts key takeaway summaries, compiles active flashcard decks, and configures test pools based on your preferences.</p>
+                    </div>
+                    <!-- Step 3 -->
+                    <div class="step-card">
+                        <div class="step-num">03</div>
+                        <h3 class="step-title">Practice & Recall</h3>
+                        <p class="step-text">Test your mastery under timed quiz conditions, study memory decks, and consult your personal AI buddy to clarify complex ideas.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Statistics Section -->
+        <section id="stats" class="stats-section glass">
+            <div class="container stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number" data-target="500000">0</span><span class="stat-plus">+</span>
+                    <p class="stat-label">Quizzes Generated</p>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" data-target="150000">0</span><span class="stat-plus">+</span>
+                    <p class="stat-label">Happy Learners</p>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" data-target="45">0</span><span class="stat-plus">%</span>
+                    <p class="stat-label">Study Efficiency Increase</p>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" data-target="4">0</span><span class="stat-plus">.9/5</span>
+                    <p class="stat-label">User Rating</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Testimonials Section -->
+        <section id="testimonials" class="testimonials-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">User Stories</span>
+                    <h2 class="section-title">What Our Learners Say</h2>
+                    <p class="section-subtitle">Discover how students, educators, and working professionals use StudySync to speed up their educational goals.</p>
+                </div>
+
+                <div class="testimonials-grid">
+                    <!-- Testimonial 1 -->
+                    <div class="testimonial-card glass">
+                        <div class="testimonial-quote">“</div>
+                        <p class="testimonial-text">This tool saved me hours of manual note-taking before my chemistry exams. The AI-generated quizzes identified exactly what concepts I was struggling with within minutes.</p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar">👩‍🎓</div>
+                            <div class="author-info">
+                                <h4 class="author-name">Sarah Jenkins</h4>
+                                <p class="author-role">Medical Student, Johns Hopkins</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Testimonial 2 -->
+                    <div class="testimonial-card glass">
+                        <div class="testimonial-quote">“</div>
+                        <p class="testimonial-text">The flashcard space-repetition and chat integrations make self-directed studying fun. I went from feeling overwhelmed to scoring high marks in my technical certification.</p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar">👨‍💻</div>
+                            <div class="author-info">
+                                <h4 class="author-name">David Zhao</h4>
+                                <p class="author-role">Software Engineer, Austin</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Testimonial 3 -->
+                    <div class="testimonial-card glass">
+                        <div class="testimonial-quote">“</div>
+                        <p class="testimonial-text">As an educator, I use StudySync to generate formative assessment concepts for my high school curriculum. It is incredibly customizable and highly intuitive.</p>
+                        <div class="testimonial-author">
+                            <div class="author-avatar">👩‍🏫</div>
+                            <div class="author-info">
+                                <h4 class="author-name">Dr. Elena Martinez</h4>
+                                <p class="author-role">Biology Professor, Chicago</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section id="faq" class="faq-section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">Got Questions?</span>
+                    <h2 class="section-title">Frequently Asked Questions</h2>
+                    <p class="section-subtitle">Everything you need to know about setting up your StudySync AI workspace.</p>
+                </div>
+
+                <div class="faq-accordion-wrapper">
+                    <!-- FAQ Item 1 -->
+                    <div class="faq-item glass">
+                        <button class="faq-trigger" aria-expanded="false">
+                            <span>How does the AI generate quizzes from my study material?</span>
+                            <span class="faq-icon" aria-hidden="true">+</span>
+                        </button>
+                        <div class="faq-panel">
+                            <p class="faq-content">Our system processes your uploaded texts using modern NLP algorithms to locate critical terminologies, definitions, core processes, and conceptual connections. It then translates these structural data points into interactive, contextually sound study options.</p>
+                        </div>
+                    </div>
+                    <!-- FAQ Item 2 -->
+                    <div class="faq-item glass">
+                        <button class="faq-trigger" aria-expanded="false">
+                            <span>What document formats does StudySync support?</span>
+                            <span class="faq-icon" aria-hidden="true">+</span>
+                        </button>
+                        <div class="faq-panel">
+                            <p class="faq-content">We support plain text, uploaded PDF documents, Microsoft Word files (DOCX), and scanned image files through integrated optical character recognition (OCR).</p>
+                        </div>
+                    </div>
+                    <!-- FAQ Item 3 -->
+                    <div class="faq-item glass">
+                        <button class="faq-trigger" aria-expanded="false">
+                            <span>Is my study data secure and private?</span>
+                            <span class="faq-icon" aria-hidden="true">+</span>
+                        </button>
+                        <div class="faq-panel">
+                            <p class="faq-content">Yes, privacy is deeply integrated. Your uploaded documents and study queries are private to your user account, stored securely in database blocks, and never used to train external public LLM models.</p>
+                        </div>
+                    </div>
+                    <!-- FAQ Item 4 -->
+                    <div class="faq-item glass">
+                        <button class="faq-trigger" aria-expanded="false">
+                            <span>Is there a limit to how many quizzes I can generate?</span>
+                            <span class="faq-icon" aria-hidden="true">+</span>
+                        </button>
+                        <div class="faq-panel">
+                            <p class="faq-content">Our free tier includes generous monthly allocations. Paid plans lift daily session parameters for learners looking for high-volume quiz generation and unlimited companion chat memory.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="contact-section">
+            <div class="container contact-container">
+                <div class="contact-info">
+                    <span class="section-tag text-left">Connect with Us</span>
+                    <h2 class="section-title text-left">Ready to Unlock Smart Studying?</h2>
+                    <p class="contact-text">Have special integration needs, support questions, or suggestions? Drop us a line. Our responsive engineering and design team is here to assist.</p>
+                    <div class="contact-methods">
+                        <div class="contact-method-item">
+                            <span class="icon">📧</span>
+                            <div>
+                                <h4>Email</h4>
+                                <p>support@studysync-ai.com</p>
+                            </div>
+                        </div>
+                        <div class="contact-method-item">
+                            <span class="icon">📍</span>
+                            <div>
+                                <h4>Headquarters</h4>
+                                <p>Austin, Texas, USA</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="contact-form-wrapper glass">
+                    <form id="contact-form" class="contact-form">
+                        <div class="form-group">
+                            <label for="contact-name" class="form-label">Full Name</label>
+                            <input type="text" id="contact-name" class="form-input" placeholder="Your name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="contact-email" class="form-label">Email Address</label>
+                            <input type="email" id="contact-email" class="form-input" placeholder="your@email.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="contact-message" class="form-label">Your Message</label>
+                            <textarea id="contact-message" class="form-input" rows="4" placeholder="How can we help your learning journey?" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-full">Send Message</button>
+                    </form>
+                    <div id="form-success-toast" class="form-success" aria-live="polite">
+                        ✅ Thank you! Your message was sent successfully. Our team will reach out soon.
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container footer-grid">
+            <div class="footer-brand">
+                <a href="quiz.html" class="logo" aria-label="StudySync AI Home">
+                    <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="32" height="32" rx="8" fill="url(#footerLogoGrad)"/>
+                        <path d="M9 16C12 11 20 11 23 16C20 21 12 21 9 16Z" stroke="white" stroke-width="2"/>
+                        <circle cx="16" cy="16" r="3" fill="white"/>
+                        <defs>
+                            <linearGradient id="footerLogoGrad" x1="0" y1="0" x2="32" y2="32">
+                                <stop stop-color="#6366F1"/>
+                                <stop offset="1" stop-color="#A855F7"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <span class="logo-text">StudySync <span class="accent-text">AI</span></span>
+                </a>
+                <p class="footer-tagline">Making smart studying accessible for learners globally.</p>
+                <p class="footer-copyright">&copy; 2026 StudySync AI. All rights reserved.</p>
+            </div>
+
+            <div class="footer-links-col">
+                <h4 class="footer-heading">Product</h4>
+                <ul class="footer-links">
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#how-it-works">How It Works</a></li>
+                    <li><a href="quiz.html">Study Dashboard</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-links-col">
+                <h4 class="footer-heading">Resources</h4>
+                <ul class="footer-links">
+                    <li><a href="#faq">FAQ</a></li>
+                    <li><a href="#contact">Contact Support</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-newsletter">
+                <h4 class="footer-heading">Join the Study Club</h4>
+                <p class="newsletter-sub">Get productivity updates, learning strategies, and AI updates.</p>
+                <form class="newsletter-form">
+                    <input type="email" class="newsletter-input" placeholder="Enter your email" required aria-label="Newsletter email">
+                    <button type="submit" class="btn btn-primary btn-sm">Subscribe</button>
+                </form>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+   /**
+ * StudySync AI - Landing Page Controller Module
+ * Manages UI interactions, sticky animations, FAQs, analytics counters, and standard form workflows.
+ */
+
+async function startQuizPrompt() {
+  const topic = prompt("Enter a topic or concept to generate a quiz on (e.g. Operating Systems, Data Structures):");
+  if (!topic) return;
+
+  // Grab (or create) a container to show the quiz as it streams in
+  const outputEl = document.getElementById('quiz-output');
+  if (outputEl) {
+    outputEl.textContent = '';
+  }
+
+  console.log("Streaming quiz for topic:", topic);
+
+  const eventSource = new EventSource(`/api/quiz?topic=${encodeURIComponent(topic)}`);
+
+  eventSource.onmessage = function(event) {
+    console.log("Stream token:", event.data);
+    if (outputEl) {
+      outputEl.textContent += event.data;
+    }
+  };
+
+  eventSource.addEventListener('done', function() {
+    console.log("Quiz stream finished.");
+    eventSource.close();
+  });
+
+  eventSource.onerror = function(err) {
+    console.error("EventSource failed:", err);
+    eventSource.close();
+  };
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initStickyHeader();
+    initMobileNavigation();
+    initFaqAccordion();
+    initAnalyticsCounters();
+    initContactFormHandler();
+    initScrollHighlights();
+});
+
+/**
+ * Adds smooth glass background styling updates to the sticky header during page scroll.
+ */
+function initStickyHeader() {
+    const header = document.querySelector('.header');
+    if (!header) return; // guard: avoid throwing if markup is missing
+
+    const handleScroll = () => {
+        if (window.scrollY > 50) {
+            header.classList.add('scrolled');
+        } else {
+            header.classList.remove('scrolled');
+        }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // Trigger initial execution check
+}
+
+/**
+ * Manages responsive slide-out configurations for mobile displays.
+ */
+function initMobileNavigation() {
+    const toggleButton = document.querySelector('.mobile-menu-toggle');
+    const navMenu = document.querySelector('.navbar-links-wrapper');
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    if (!toggleButton || !navMenu) return; // guard: avoid throwing if markup is missing
+
+    const toggleMenu = () => {
+        const isExpanded = toggleButton.getAttribute('aria-expanded') === 'true';
+        toggleButton.setAttribute('aria-expanded', !isExpanded);
+        toggleButton.classList.toggle('active');
+        navMenu.classList.toggle('active');
+
+        // Prevent background document scrolling while drawer menu is active
+        document.body.style.overflow = !isExpanded ? 'hidden' : '';
+    };
+
+    toggleButton.addEventListener('click', toggleMenu);
+
+    // Auto-close menu overlay once link is clicked
+    navLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            if (navMenu.classList.contains('active')) {
+                toggleMenu();
+            }
+        });
+    });
+}
+
+/**
+ * Orchestrates keyboard-accessible expand/collapse state changes for FAQ Accordions.
+ */
+function initFaqAccordion() {
+    const faqTriggers = document.querySelectorAll('.faq-trigger');
+    if (!faqTriggers.length) return; // guard: nothing to wire up
+
+    faqTriggers.forEach(trigger => {
+        trigger.addEventListener('click', () => {
+            const faqItem = trigger.closest('.faq-item');
+            const panel = trigger.nextElementSibling;
+            const isOpened = trigger.getAttribute('aria-expanded') === 'true';
+
+            // Close other currently expanded items
+            document.querySelectorAll('.faq-item').forEach(item => {
+                if (item !== faqItem && item.classList.contains('active')) {
+                    const activeTrigger = item.querySelector('.faq-trigger');
+                    const activePanel = activeTrigger.nextElementSibling;
+                    activeTrigger.setAttribute('aria-expanded', 'false');
+                    item.classList.remove('active');
+                    activePanel.style.maxHeight = null;
+                }
+            });
+
+            // Toggle selected state
+            trigger.setAttribute('aria-expanded', !isOpened);
+            faqItem.classList.toggle('active');
+
+            if (!isOpened) {
+                panel.style.maxHeight = panel.scrollHeight + "px";
+            } else {
+                panel.style.maxHeight = null;
+            }
+        });
+    });
+}
+
+/**
+ * Intersection Observer matching callback to dynamically animate static numeric metrics
+ * once elements load into standard viewport perspective.
+ */
+function initAnalyticsCounters() {
+    const statNumbers = document.querySelectorAll('.stat-number');
+    if (!statNumbers.length) return; // guard: nothing to observe
+
+    const countAnimation = (element) => {
+        const targetVal = parseFloat(element.getAttribute('data-target'));
+        if (isNaN(targetVal)) return; // guard: bad/missing data-target
+        const isDecimal = targetVal % 1 !== 0;
+        const animationDuration = 1800; // Complete transitions under 1.8s
+        const stepsCount = 60;
+        const stepTime = animationDuration / stepsCount;
+        let currentStepVal = 0;
+
+        const updateCounter = () => {
+            currentStepVal += targetVal / stepsCount;
+            if (currentStepVal >= targetVal) {
+                element.textContent = isDecimal ? targetVal.toFixed(1) : Math.round(targetVal).toLocaleString();
+            } else {
+                element.textContent = isDecimal ? currentStepVal.toFixed(1) : Math.round(currentStepVal).toLocaleString();
+                setTimeout(updateCounter, stepTime);
+            }
+        };
+
+        updateCounter();
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                countAnimation(entry.target);
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.6 });
+
+    statNumbers.forEach(num => observer.observe(num));
+}
+
+/**
+ * Handles mock asynchronous requests for contact submittals and triggers feedback indicators.
+ */
+function initContactFormHandler() {
+    const form = document.getElementById('contact-form');
+    const successToast = document.getElementById('form-success-toast');
+
+    if (!form) return;
+
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        // Access form properties (for future backend API integration hooks)
+        const name = document.getElementById('contact-name').value;
+        const email = document.getElementById('contact-email').value;
+        const message = document.getElementById('contact-message').value;
+
+        // Simulate secure async submit requests
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending Message...';
+
+        setTimeout(() => {
+            // Restore visual layout, display feedback state, and reset values
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Send Message';
+            form.reset();
+
+            if (successToast) {
+                successToast.style.display = 'block';
+                successToast.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+                // Clear response banner automatically
+                setTimeout(() => {
+                    successToast.style.display = 'none';
+                }, 6000);
+            }
+        }, 1200);
+    });
+}
+
+/**
+ * Updates dynamic navbar links on viewports as readers traverse standard layout coordinates.
+ */
+function initScrollHighlights() {
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-link');
+    if (!sections.length || !navLinks.length) return; // guard: nothing to sync
+
+    const observerOptions = {
+        root: null,
+        rootMargin: '-30% 0px -60% 0px', // Trigger once sections capture active middle screen focus
+        threshold: 0
+    };
+
+    const sectionObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const activeId = entry.target.getAttribute('id');
+                navLinks.forEach(link => {
+                    // FIX: this must be a template literal (backticks), not a bare expression.
+                    // The original `#${activeId}` (no backticks) is a JS syntax error that
+                    // breaks parsing of the entire file.
+                    if (link.getAttribute('href') === `#${activeId}`) {
+                        link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
+            }
+        });
+    }, observerOptions);
+
+    sections.forEach(section => sectionObserver.observe(section));
+}  
+</script>
+</body>
+</html>
